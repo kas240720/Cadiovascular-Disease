@@ -19,7 +19,7 @@ percent = (hd.isnull().sum()/hd.isnull().count()).sort_values(ascending=False)
 missing_data = pd.concat([total,percent], axis = 1, keys = ['Total', 'Percent'])
 print(missing_data)
 
-# EDA
+## EDA
 
 # age
 hd['age'] = (hd['age']/365).round().astype('int')
@@ -41,5 +41,15 @@ hd = hd.drop(['ap_hi', 'ap_lo'], axis = 1)
 
 # bp_level and cardio
 bp = sns.countplot(x='bp_level', hue = 'cardio', data= hd)
-plt.show()
 
+print(hd.head())
+
+
+# BMI
+hd['bmi'] = hd.weight/((hd.height/100) * (hd.height/100))
+print(hd.bmi.head())
+
+bmi= sns.FacetGrid(hd, col = 'gender', hue = 'cardio')
+bmi.map(plt.scatter, 'bmi', 'age', alpha =.7)
+g.add_legend()
+plt.show()
