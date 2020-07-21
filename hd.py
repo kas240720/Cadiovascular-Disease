@@ -30,27 +30,16 @@ ag = sns.countplot(x = 'age', hue='cardio' ,data=hd)
 sub = pd.melt(hd, id_vars = ['cardio'], value_vars=['alco','smoke','active','gluc', 'cholesterol'])
 g = sns.catplot(x='variable', hue = 'value', col='cardio', kind ='count',data = sub)
 
+# Creating bp_level variable
+hd.loc[(hd['ap_hi'] < 120) & (hd['ap_lo'] < 80), 'bp_level'] = 'normal'
+hd.loc[(hd['ap_hi'] >= 120) & (hd['ap_hi'] < 130) & (hd['ap_lo'] < 80), 'bp_level'] = 'elevated'
+hd.loc[(hd['ap_hi'] >= 130) & (hd['ap_hi'] < 140) | (hd['ap_lo'] >= 80) & (hd['ap_lo'] < 90),'bp_level'] = 'high blood pressure 1'
+hd.loc[(hd['ap_hi'] >= 140) & (hd['ap_hi'] < 180) | (hd['ap_lo'] >= 90) & (hd['ap_lo'] <120 ), 'bp_level'] = 'high blood pressure 2'
+hd.loc[(hd['ap_hi'] >= 180) | (hd['ap_lo'] >= 120) , 'bp_level'] = 'hypertensive crisis'
 
-hd.loc[(hd['ap_hi'] <= 120) & (hd['ap_lo'] < 80), ['bp_level']] = 'normal'
-hd.loc[(hd['ap_hi'] > 120) & (hd['ap_hi'] <= 129) & (hd['ap_lo'] < 80), ['bp_level']] = 'elevated'
-hd.loc[(hd['ap_hi'] > 130) & (hd['ap_hi'] <= 139) | (hd['ap_lo'] >= 80) & (hd['ap_lo'] < 89), ['bp_level']] = 'high blood pressure 1'
-hd.loc[(hd['ap_hi'] > 140) & (hd['ap_hi'] <= 179) | (hd['ap_lo'] > 90) & (hd['ap_lo'] <119 ), ['bp_level']] = 'high blood pressure 2'
-hd.loc[(hd['ap_hi'] > 180) | (hd['ap_lo'] > 120) , ['bp_level']] = 'hypertensive crisis'
+hd = hd.drop(['ap_hi', 'ap_lo'], axis = 1)
 
+# bp_level and cardio
+bp = sns.countplot(x='bp_level', hue = 'cardio', data= hd)
+plt.show()
 
-# conditions = [
-# (hd.loc[(hd['ap_hi'] <= 120) & (hd['ap_lo'] < 80)]),
-# (hd.loc[(hd['ap_hi'] > 120) & (hd['ap_hi'] <= 129) & (hd['ap_lo'] < 80)]),
-# (hd.loc[(hd['ap_hi'] > 130) & (hd['ap_hi'] <= 139) | (hd['ap_lo'] >= 80) & (hd['ap_lo'] < 89)]),
-# (hd.loc[(hd['ap_hi'] > 140) & (hd['ap_hi'] <= 179) | (hd['ap_lo'] > 90) & (hd['ap_lo'] <119 )]),
-# (hd.loc[(hd['ap_hi'] > 180) | (hd['ap_lo'] > 120)])]
-# choices = ['normal', 'elevated', 'hi bld prs1' , 'hi bld prs2', 'hypertensive crisis']
-# hd['blood pressure'] = np.select(conditions, choices, default = 0)
-
-
-
-# hd.loc[(hd['ap_hi'] <= 120) & (hd['ap_lo'] < 80),['ap_hi','ap_lo']] = 'normal'
-# hd.loc[(hd['ap_hi'] > 120) & (hd['ap_hi'] <= 129) & (hd['ap_lo'] < 80), ['ap_hi','ap_lo']] = 'elevated'
-# hd.loc[(hd['ap_hi'] > 130) & (hd['ap_hi'] <= 139) | (hd['ap_lo'] >= 80) & (hd['ap_lo'] < 89), ['ap_hi','ap_lo']] = 'high blood pressure 1'
-# hd.loc[(hd['ap_hi'] > 140) & (hd['ap_hi'] <= 179) | (hd['ap_lo'] > 90) & (hd['ap_lo'] <119 ), ['ap_hi','ap_lo']] = 'high blood pressure 2'
-# hd.loc[(hd['ap_hi'] > 180) | (hd['ap_lo'] > 120) , ['ap_hi','ap_lo']] = 'hypertensive crisis'
