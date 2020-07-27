@@ -31,11 +31,13 @@ sub = pd.melt(hd, id_vars = ['cardio'], value_vars=['alco','smoke','active','glu
 # g = sns.catplot(x='variable', hue = 'value', col='cardio', kind ='count',data = sub)
 
 # Creating bp_level variable
-hd.loc[(hd['ap_hi'] < 120) & (hd['ap_lo'] < 80), 'bp_level'] = 'normal'
-hd.loc[(hd['ap_hi'] >= 120) & (hd['ap_hi'] < 130) & (hd['ap_lo'] < 80), 'bp_level'] = 'elevated'
-hd.loc[(hd['ap_hi'] >= 130) & (hd['ap_hi'] < 140) | (hd['ap_lo'] >= 80) & (hd['ap_lo'] < 90),'bp_level'] = 'high bp 1'
-hd.loc[(hd['ap_hi'] >= 140) & (hd['ap_hi'] < 180) | (hd['ap_lo'] >= 90) & (hd['ap_lo'] <120 ), 'bp_level'] = 'high bp 2'
-hd.loc[(hd['ap_hi'] >= 180) | (hd['ap_lo'] >= 120) , 'bp_level'] = 'hypertensive crisis'
+hd.loc[(hd['ap_hi'] < 120) & (hd['ap_lo'] < 80), 'bp_level'] = 1 # 1 = normal
+hd.loc[(hd['ap_hi'] >= 120) & (hd['ap_hi'] < 130) & (hd['ap_lo'] < 80), 'bp_level'] = 2 # 2 = elevated
+hd.loc[(hd['ap_hi'] >= 130) & (hd['ap_hi'] < 140) | (hd['ap_lo'] >= 80) & (hd['ap_lo'] < 90),'bp_level'] = 3 # 3 = 'high bp 1'
+hd.loc[(hd['ap_hi'] >= 140) & (hd['ap_hi'] < 180) | (hd['ap_lo'] >= 90) & (hd['ap_lo'] <120 ), 'bp_level'] = 4 # 4 ='high bp 2'
+hd.loc[(hd['ap_hi'] >= 180) | (hd['ap_lo'] >= 120) , 'bp_level'] = 5 # 5 = 'hypertensive crisis'
+
+
 
 hd = hd.drop(['ap_hi', 'ap_lo'], axis = 1)
 
@@ -72,13 +74,74 @@ cols = hd.corr().nlargest(13, 'cardio')['cardio'].index
 cm = np.corrcoef(hd[cols].values.T)
 sns.set(font_scale=1.25)
 hm = sns.heatmap(cm, cbar=True, annot=True, square=True, fmt='.2f', annot_kws={'size': 10}, yticklabels=cols.values, xticklabels=cols.values)
-plt.show()
+
 
 # split train and test data
-
-# Decisiontree classfier, randomforest, machine learning
-
-#find the accuarcy
+x = hd.drop("cardio", axis=1)
+y = hd["cardio"]
 
 
+from sklearn.model_selection import train_test_split
+x_train, x_test, y_train, y_test = train_test_split(x,y,test_size =0.2, random_state=42)
 
+print(x_train.shape, x_test.shape, y_train.shape, y_test.shape)
+
+
+# Support Vector Machines
+from sklearn.svm import SVC, LinearSVC
+svc = SVC()
+svc.fit(x_train, y_train)
+Y_pred = svc.predict(x_test)
+acc_svc = round(svc.score(x_train, y_train) * 100,2)
+print(acc_svc)
+
+# Linear SVC
+linear_svc = LinearSVC()
+linear_svc.fit(x_train, y_train)
+Y_pred = linear_svc.predict(x_test)
+acc_linear_svc = round(linear_svc.score(x_train, y_train) * 100, 2)
+print(acc_linear_svc)
+
+# Random Forest Classifier
+from sklearn.ensemble import RandomForestClassifier
+random_forest = RandomForestClassifier(n_estimators=100)
+random_forest.fit(x_train, y_train)
+Y_pred = random_forest.predict(x_test)
+random_forest.score(x_train, y_train)
+acc_random_forest = round(random_forest.score(x_train, y_train) * 100, 2)
+print(acc_random_forest)
+
+# KNN Neighbor Classifier
+from sklearn.neighbors import KNeighborsClassifier
+knn = KNeighborsClassifier(n_neighbors=3)
+knn.fit(x_train, y_train)
+y_pred = knn.predict(x_test)
+acc_knn = round(knn.score(x_train, y_train) * 100,2)
+print(acc_knn)
+
+# Decision Tree Classifier
+from sklearn.tree import DecisionTreeClassifier
+dc_tree = DecisionTreeClassifier()
+dc_tree.fit(x_train, y_train)
+y_pred = dc_tree.predict(x_test)
+acc_dc_tree = round(dc_tree.score(x_train, y_train) * 100 ,2)
+print(acc_dc_tree)
+
+# Gaussian Naive Bayes
+from sklearn.naive_bayes import GaussianNB
+guas = GaussianNB()
+y_pred = gaus.predict(x_test)
+acc_guas = round(gaus.score(x_train, y_train) * 100,2)
+print(acc_gaus)
+
+# Find the accuarcy
+models = pd.DataFrame({
+    'Model': ['Support Vector Machines', 'KNN', 
+              'Random Forest', 'Naive Bayes',  
+              'Linear SVC', 'Decision Tree'],
+    'Score': [acc_svc, acc_knn,  
+              acc_random_forest, acc_gaus, 
+             acc_linear_svc, acc_dc_tree]})
+models.sort_values(by='Score', ascending=False)
+
+print(models)
