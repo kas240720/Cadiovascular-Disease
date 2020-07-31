@@ -92,23 +92,23 @@ from sklearn.svm import SVC, LinearSVC
 svc = SVC()
 svc.fit(x_train, y_train)
 Y_pred = svc.predict(x_test)
-acc_svc = round(svc.score(x_train, y_train) * 100,2)
-print(acc_svc)
+acc_svc = round(svc.score(x_test, y_test) * 100,2)
 
-# Linear SVC
-linear_svc = LinearSVC()
-linear_svc.fit(x_train, y_train)
-Y_pred = linear_svc.predict(x_test)
-acc_linear_svc = round(linear_svc.score(x_train, y_train) * 100, 2)
-print(acc_linear_svc)
+#Naive bayes
+from sklearn.naive_bayes import GaussianNB
+gaussian = GaussianNB()
+gaussian.fit(x_train, y_train)
+Y_pred = gaussian.predict(x_test)
+acc_gaussian = round(gaussian.score(x_test, y_test) * 100, 2)
+
 
 # Random Forest Classifier
 from sklearn.ensemble import RandomForestClassifier
 random_forest = RandomForestClassifier(n_estimators=100)
 random_forest.fit(x_train, y_train)
 Y_pred = random_forest.predict(x_test)
-random_forest.score(x_train, y_train)
-acc_random_forest = round(random_forest.score(x_train, y_train) * 100, 2)
+random_forest.score(x_test, y_test)
+acc_random_forest = round(random_forest.score(x_test, y_test) * 100, 2)
 print(acc_random_forest)
 
 # KNN Neighbor Classifier
@@ -116,32 +116,24 @@ from sklearn.neighbors import KNeighborsClassifier
 knn = KNeighborsClassifier(n_neighbors=3)
 knn.fit(x_train, y_train)
 y_pred = knn.predict(x_test)
-acc_knn = round(knn.score(x_train, y_train) * 100,2)
-print(acc_knn)
+acc_knn = round(knn.score(x_test, y_test) * 100,2)
+
 
 # Decision Tree Classifier
 from sklearn.tree import DecisionTreeClassifier
 dc_tree = DecisionTreeClassifier()
 dc_tree.fit(x_train, y_train)
 y_pred = dc_tree.predict(x_test)
-acc_dc_tree = round(dc_tree.score(x_train, y_train) * 100 ,2)
-print(acc_dc_tree)
+acc_dc_tree = round(dc_tree.score(x_test, y_test) * 100 ,2)
 
-# Gaussian Naive Bayes
-from sklearn.naive_bayes import GaussianNB
-guas = GaussianNB()
-y_pred = gaus.predict(x_test)
-acc_guas = round(gaus.score(x_train, y_train) * 100,2)
-print(acc_gaus)
+
 
 # Find the accuarcy
 models = pd.DataFrame({
     'Model': ['Support Vector Machines', 'KNN', 
-              'Random Forest', 'Naive Bayes',  
-              'Linear SVC', 'Decision Tree'],
-    'Score': [acc_svc, acc_knn,  
-              acc_random_forest, acc_gaus, 
-             acc_linear_svc, acc_dc_tree]})
+              'Random Forest','Gaussian', 'Decision Tree'],
+    'Score': [acc_svc, acc_knn, acc_random_forest, 
+             acc_gaussian, acc_dc_tree]})
 models.sort_values(by='Score', ascending=False)
 
 print(models)
