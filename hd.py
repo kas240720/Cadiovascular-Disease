@@ -64,7 +64,7 @@ def hexbin(x, y, color, **kwargs):
 
 with sns.axes_style("dark"):
     g = sns.FacetGrid(hd, hue="cardio", col="cardio", height=4)
-g.map(hexbin, "age", "bmi", extent=[20,100,0, 50]);
+g.map(hexbin, "age", "bmi", extent=[20,100,0, 50])
 
 
 # Correlation
@@ -137,3 +137,24 @@ models = pd.DataFrame({
 models.sort_values(by='Score', ascending=False)
 
 print(models)
+
+#
+from sklearn.metrics import classification_report
+from sklearn.metrics import confusion_matrix
+pred = random_forest.predict(x_test)
+print(confusion_matrix(y_test, pred))
+print(classification_report(y_test, pred))
+
+k_range = range(1,200)
+scores = []
+
+for k in k_range:
+    knn = RandomForestClassifier(n_estimators=k)
+    random_forest.fit(x_train, y_train)
+    scores.append(random_forest.score(x_test, y_test))
+plt.figure()
+plt.xlabel('k')
+plt.ylabel('accuracy')
+plt.scatter(k_range, scores)
+plt.xticks([0,50,100,150,200])
+plt.show()
