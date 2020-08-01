@@ -1,5 +1,3 @@
-# GOAL : 
-
 import numpy as np # linear algebra
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import seaborn as sns 
@@ -19,16 +17,20 @@ percent = (hd.isnull().sum()/hd.isnull().count()).sort_values(ascending=False)
 missing_data = pd.concat([total,percent], axis = 1, keys = ['Total', 'Percent'])
 print(missing_data)
 
-## EDA
+
+# EDA
 
 # age
 hd['age'] = (hd['age']/365).round().astype('int')
-# ag = sns.countplot(x = 'age', hue='cardio' ,data=hd)
+ag = sns.countplot(x = 'age', hue='cardio' ,data=hd)
 
+plt.show()
 
 # subject and examination variables
 sub = pd.melt(hd, id_vars = ['cardio'], value_vars=['alco','smoke','active','gluc', 'cholesterol'])
-# g = sns.catplot(x='variable', hue = 'value', col='cardio', kind ='count',data = sub)
+g = sns.catplot(x='variable', hue = 'value', col='cardio', kind ='count',data = sub)
+
+plt.show()
 
 # Creating bp_level variable
 hd.loc[(hd['ap_hi'] < 120) & (hd['ap_lo'] < 80), 'bp_level'] = 1 # 1 = normal
@@ -55,8 +57,10 @@ hd.drop(hd[(hd['bmi'] > hd['bmi'].quantile(0.975)) | (hd['bmi'] < hd['bmi'].quan
 
 print(hd.bmi.describe())
 
-# bmi = sns.FacetGrid(hd, col = 'cardio', hue = 'gender')
-# bmi.map(plt.scatter, 'bmi', 'age' ).add_legend()
+bmi = sns.FacetGrid(hd, col = 'cardio', hue = 'gender')
+bmi.map(plt.scatter, 'bmi', 'age' ).add_legend()
+
+plt.show()
 
 def hexbin(x, y, color, **kwargs):
     cmap = sns.light_palette(color, as_cmap=True)
@@ -66,6 +70,7 @@ with sns.axes_style("dark"):
     g = sns.FacetGrid(hd, hue="cardio", col="cardio", height=4)
 g.map(hexbin, "age", "bmi", extent=[20,100,0, 50])
 
+plt.show()
 
 # Correlation
 
@@ -75,8 +80,9 @@ cm = np.corrcoef(hd[cols].values.T)
 sns.set(font_scale=1.25)
 hm = sns.heatmap(cm, cbar=True, annot=True, square=True, fmt='.2f', annot_kws={'size': 10}, yticklabels=cols.values, xticklabels=cols.values)
 
+plt.show()
 
-# split train and test data
+# Split train and test data
 x = hd.drop("cardio", axis=1)
 y = hd["cardio"]
 
@@ -94,7 +100,7 @@ svc.fit(x_train, y_train)
 Y_pred = svc.predict(x_test)
 acc_svc = round(svc.score(x_test, y_test) * 100,2)
 
-#Naive bayes
+# Naive bayes
 from sklearn.naive_bayes import GaussianNB
 gaussian = GaussianNB()
 gaussian.fit(x_train, y_train)
@@ -138,7 +144,7 @@ models.sort_values(by='Score', ascending=False)
 
 print(models)
 
-#
+# classification report and accuracy
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 pred = random_forest.predict(x_test)
