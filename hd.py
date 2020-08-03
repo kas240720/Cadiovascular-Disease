@@ -132,14 +132,23 @@ dc_tree.fit(x_train, y_train)
 y_pred = dc_tree.predict(x_test)
 acc_dc_tree = round(dc_tree.score(x_test, y_test) * 100 ,2)
 
+# Xgboost Classifier
+import xgboost as xgb
+from xgboost.sklearn import XGBClassifier
+xg = XGBClassifier()
+xg.fit(x_train, y_train)
+y_pred = xg.predict(x_test)
+acc_xg = round(xg.score(x_test, y_test) * 100, 2)
+
+
 
 
 # Find the accuarcy
 models = pd.DataFrame({
     'Model': ['Support Vector Machines', 'KNN', 
-              'Random Forest','Gaussian', 'Decision Tree'],
+              'Random Forest','Gaussian', 'Decision Tree', 'XgBoost'],
     'Score': [acc_svc, acc_knn, acc_random_forest, 
-             acc_gaussian, acc_dc_tree]})
+             acc_gaussian, acc_dc_tree, acc_xg]})
 models.sort_values(by='Score', ascending=False)
 
 print(models)
@@ -147,20 +156,8 @@ print(models)
 # classification report and accuracy
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
-pred = random_forest.predict(x_test)
+pred = xg.predict(x_test)
 print(confusion_matrix(y_test, pred))
 print(classification_report(y_test, pred))
 
-k_range = range(1,200)
-scores = []
 
-for k in k_range:
-    knn = RandomForestClassifier(n_estimators=k)
-    random_forest.fit(x_train, y_train)
-    scores.append(random_forest.score(x_test, y_test))
-plt.figure()
-plt.xlabel('k')
-plt.ylabel('accuracy')
-plt.scatter(k_range, scores)
-plt.xticks([0,50,100,150,200])
-plt.show()
